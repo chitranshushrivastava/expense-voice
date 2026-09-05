@@ -456,15 +456,14 @@
 
 <script>
   // ⚠️ IMPORTANT: Apna Apps Script deployment URL yahan paste karo
-  const SCRIPT_URL = https://script.google.com/macros/s/AKfycbwxRoLvYgLJRWhJT3o6ILqPb-Mf-VG7YE8FyoCx9p4fsVrp6zr07zfpUdW_so2ycYq7/exec ;
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxRoLvYgLJRWhJT3o6ILqPb-Mf-VG7YE8FyoCx9p4fsVrp6zr07zfpUdW_so2ycYq7/exec";
 
   // Reusable helper — replaces google.script.run, works from any domain
+  // Uses GET (not POST) because Apps Script's POST responses don't include
+  // proper CORS headers and get blocked by the browser cross-origin.
   function callApi(action, params, onSuccess, onError) {
-    fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(Object.assign({ action: action }, params || {}))
-    })
+    const query = new URLSearchParams(Object.assign({ action: action }, params || {})).toString();
+    fetch(SCRIPT_URL + '?' + query)
       .then(res => res.json())
       .then(res => {
         if (res.ok) onSuccess(res.data);
